@@ -143,7 +143,7 @@ func (a *Analyzer) convert2Spec() error {
 	}
 
 	sort.SliceStable(a.spec.Types, func(i, j int) bool {
-		return a.spec.Types[i].Name() < a.spec.Types[j].Name()
+		return a.spec.Types[i].Name() > a.spec.Types[j].Name()
 	})
 
 	groups := make([]spec.Group, 0, len(a.spec.Service.Groups))
