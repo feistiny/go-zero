@@ -1,9 +1,6 @@
 package swagger
 
 import (
-	"fmt"
-	"strings"
-
 	"github.com/zeromicro/go-zero/tools/goctl/api/spec"
 )
 
@@ -51,20 +48,13 @@ func contains(list []string, s string) bool {
 	}
 	return false
 }
-func CheckContains(parents []string, name string) {
-	if contains(parents, name) {
-		// 过滤掉空字符串
-		var filtered []string
-		for _, p := range parents {
-			if p != "" {
-				filtered = append(filtered, p)
-			}
-		}
-		panic(fmt.Sprintf("结构体存在递归引用 %+v %v", strings.Join(filtered, "->"), name))
-	}
-}
 
 func fillStruct(tp spec.Type, allTypes map[string]spec.DefineStruct, parents ...string) spec.Type {
+	// fmt.Printf("正在检查%v %v", len(parents), parents)
+	// 递归调用直接返回
+	if tp == nil || contains(parents, tp.Name()) {
+		return tp
+	}
 	switch val := tp.(type) {
 	case spec.DefineStruct:
 		var members []spec.Member
@@ -95,7 +85,6 @@ func fillStruct(tp spec.Type, allTypes map[string]spec.DefineStruct, parents ...
 					Value:   fillStruct(memberType.Value, allTypes, append(parents, val.Name())...),
 				}
 			case spec.DefineStruct:
-				CheckContains(append(parents, val.Name()), memberType.Name())
 				if st, ok := allTypes[memberType.Name()]; ok {
 					member.Type = fillStruct(st, allTypes, append(parents, val.Name())...)
 				}
@@ -127,7 +116,6 @@ func fillStruct(tp spec.Type, allTypes map[string]spec.DefineStruct, parents ...
 					Value:   fillStruct(memberType.Value, allTypes, append(parents, val.Name())...),
 				}
 			case spec.DefineStruct:
-				CheckContains(append(parents, val.Name()), memberType.Name())
 				if st, ok := allTypes[memberType.Name()]; ok {
 					member.Type = fillStruct(st, allTypes, append(parents, val.Name())...)
 				}
