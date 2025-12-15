@@ -52,7 +52,10 @@ func contains(list []string, s string) bool {
 func fillStruct(tp spec.Type, allTypes map[string]spec.DefineStruct, parents ...string) spec.Type {
 	// fmt.Printf("正在检查%v %v", len(parents), parents)
 	// 递归调用直接返回
-	if tp == nil || contains(parents, tp.Name()) {
+	if tp == nil || (contains(parents, tp.Name()) &&
+		parents[len(parents)-1] == tp.Name() &&
+		parents[len(parents)-2] == tp.Name() && // 遇到递归结构，保证递归结构的children在swagger里也有字段，跟改之前的行为保持一致
+		len(parents) > 1) {
 		return tp
 	}
 	switch val := tp.(type) {
