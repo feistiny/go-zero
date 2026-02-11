@@ -51,7 +51,7 @@ func parametersFromType(ctx Context, method string, tp apiSpec.Type) []spec.Para
 		hasForm := formTag != nil
 
 		jsonTag, _ := tag.Get(tagJson)
-		hasJson := jsonTag != nil
+		hasJson := jsonTag != nil && jsonTag.Name != "-"
 		if hasHeader {
 			minimum, maximum, exclusiveMinimum, exclusiveMaximum := rangeValueFromOptions(headerTag.Options)
 			resp = append(resp, spec.Parameter{
